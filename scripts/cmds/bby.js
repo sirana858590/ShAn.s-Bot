@@ -6,9 +6,9 @@ const baseApiUrl = async () => {
 
 module.exports.config = {
   name: "bby",
-  aliases: ["baby", "bot", "kuttu"],
+  aliases: ["shan", "faiza", "baby", "bot", "kuttu"],
   version: "6.9.0",
-  author: "dipto",
+  author: "ShAn",
   countDown: 0,
   role: 0,
   description: "better then all sim simi",
@@ -143,33 +143,33 @@ module.exports.onReply = async ({ api, event, Reply }) => {
 module.exports.onChat = async ({ api, event,message }) => {
   try{
     const body = event.body ? event.body.toLowerCase() : ""
-    if(body.startsWith("baby") || body.startsWith("bby") || body.startsWith("bot") || body.startsWith("janu") || body.startsWith("kuttu")){
-      const arr = body.replace(/^\S+\s*/, "") || "hasan";
-      if (arr === "hasan"){ 
+    if(body.startsWith("baby") || body.startsWith("bby") || body.startsWith("bot") || body.startsWith("janu") || body.startsWith("kuttu") || body.startsWith("faiza")){
+      const arr = body.replace(/^\S+\s*/, "") || "shan";
+      if (arr === "shan"){ 
 const funnyReplies = [
-          "কি হয়ছে বেবি দাকস কেন 🍆🙂",
+    "কি হয়ছে বেবি দাকস কেন 🍆🙂",
     "আমারে কেনো লাগবে তুর বল 🦆",
     "Ami ekhane bby 🥹",
     "Amake vhule jaw 🤌😫",
-    "Ei ne amar rubbish boss er id\n\n✨ https://www.facebook.com/Itz.HaSaN.00 🫰\n\namare arr disturb korbi nah jah 😑😒",
+    "Ei ne amar rubbish boss er id\n\n✨ https://www.facebook.com/sirana252 🫰\n\namare arr disturb korbi nah jah 😑😒",
     "ki hoiche ki koibi ?🐐",
     "kire bukachuda dakhtechos killai etw🐐👈",
-    "Ami shudhu hasan er bbu🤌😫",
+    "Ami shudhu ShAn er bbu🤌😫",
     "I love you ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh🫦💋",
     "Kire bolod, amare koitechos naki? 🐸",
-    "ei new jush khaw, bot bolte bolte hapai gecho 🧃",
+    "Ei new jush khaw, bot bolte bolte hapai gecho 🧃",
     "Amake vhule jao 🥺",
-    "Ami shudhu Hasan er. Don't disturb me! 🤦",
+    "Ami shudhu ShAn er. Don't disturb me! 🤦",
     "bujhchi tui je Single na hole amare dakti na ekhon ki bolbi bol! 🙂🤌",
-    "ei mon tumake dilam 🦆💨",
-    "bujhchi tur kew nai amar motoi single 🫶💔",
+    "Ei mon tumake dilam 🦆💨",
+    "Bujhchi tur kew nai amar motoi single 🫶💔",
     "কিরে বলদ তুই এইখানে !?🍆",
     "জানিস তুর আর আমার মিল কিসে ? ওইটা হচ্ছে তুই ও লুইচ্চা আর আমার কথা কি কমু!?🙂🚬",
-    "আমার বস হাসান রে ডাক ওই সিঙ্গেল আছে 🐸🫦",
+    "আমার বস ShAn রে ডাক ওই সিঙ্গেল আছে 🐸🫦",
     "কি হইছে আমার কি কাজে লাগবে তুর !?🌚👀",
     "তুই সেই লুইচ্চাটা না !? 🙂🔪",
-    "bby daktecho kno ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh 🫦💋\n\n🗣️Hasan🐸🔪",
-    "tui ki janosh tui ekhta bolod !? 🦆💨"
+    "Bby daktecho kno ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh 🫦💋\n\n🗣️ShAn🐸🔪",
+    "Tui ki janosh tui ekhta bolod !? 🦆💨"
         ];
         return api.sendMessage(funnyReplies[Math.floor(Math.random() * funnyReplies.length)], event.threadID, (error, info) => {
 
