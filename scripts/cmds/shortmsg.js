@@ -95,13 +95,13 @@ Birthday: 11 December 2007
       });
     }
 
-    if (text === "hasan") {
+    if (text === "shan") {
       return message.reply({
         body: `
 ~ Ore dako kno !? ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh 😘💋👀`,
       });
     }
-    if (text === "toxic") {
+    if (text === "faizo") {
       return message.reply({
         body: `
  Yes!? i am the lord of toxic 💀✌️`,
