@@ -1,6 +1,6 @@
 module.exports = {
  config: {
-	 name: "toxiciter",
+	 name: "zzzzzzz",
 	 version: "1.0",
 	 author: "Hasan",//remodified by cliff
 	 countDown: 5,
