@@ -17,7 +17,7 @@ module.exports = {
 			vi: "Thêm thành viên vào box chat của bạn",
 			en: "Add user to box chat of you"
 		},
-		category: "box chat",
+		category: "𝗚𝗥𝗢𝗨𝗣 𝗠𝗔𝗡𝗔𝗚𝗘𝗠𝗘𝗡𝗧",
 		guide: {
 			en: "   {pn} [link profile | uid] (or reply to a message)"
 		}
