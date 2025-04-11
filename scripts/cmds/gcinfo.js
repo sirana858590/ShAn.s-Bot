@@ -4,7 +4,7 @@ const request = require("request");
 
 module.exports = {
   config: {
-    name: "spygc",
+    name: "gcinfo",
     version: "1.0",
     author: "Kshitiz",
     countDown: 5,
