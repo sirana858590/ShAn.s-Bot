@@ -18,15 +18,13 @@ module.exports = {
 	onStart: async function ({ api, event }) {
 		try {
 			const ownerInfo = {
-				name: '𝑯𝑨𝑺𝑨𝑵 𝑴𝑨𝑯𝑴𝑼𝑫',
-				class: '𝑺𝑺𝑪 𝑪𝑨𝑵𝑫𝑰𝑫𝑨𝑻𝑬',
-				group: '𝑺𝑪𝑰𝑬𝑵𝑪𝑬',
+				name: '𝐸𝑊𝑅 𝑆𝐻𝐴𝑁',
 				gender: '𝑴𝑨𝑳𝑬',
-				Birthday: '𝟐𝟐-𝟎𝟕-𝟐𝟎𝟎𝟖',
+				Birthday: '10-𝟎𝟕-𝟐𝟎𝟎5',
 				religion: '𝑰𝑺𝑳𝑨𝑴',
 				hobby: '𝑭𝒍𝒊𝒓𝒕𝒊𝒏𝒈 😁',
-				Fb: 'https://www.facebook.com/Itz.HaSaN.00',
-				Relationship: '𝑨𝑳𝑾𝑨𝒀𝑺 𝑩𝑬 𝑺𝑰𝑵𝑮𝑳𝑬',
+				Fb: 'https://www.facebook.com/sirana252',
+				Relationship: '𝑩𝑶𝑳𝑩𝑶 𝑵𝑨',
 				Height: '5"4'
 			};
 
@@ -45,8 +43,6 @@ module.exports = {
 			const response = `
 𓀬 𝐎𝐖𝐍𝐄𝐑 𝐈𝐍𝐅𝐎 𓀬 \n
  ~𝙉𝘼𝙈𝙀: ${ownerInfo.name}
- ~𝘾𝙇𝘼𝙎𝙎: ${ownerInfo.class}
- ~𝙂𝙍𝙊𝙐𝙋: ${ownerInfo.group}
  ~𝙂𝙀𝙉𝘿𝙀𝙍: ${ownerInfo.gender}
  ~𝘽𝙄𝙍𝙏𝙃𝘿𝘼𝙔: ${ownerInfo.Birthday}
  ~𝙍𝙀𝙇𝙄𝙂𝙄𝙊𝙉: ${ownerInfo.religion}
