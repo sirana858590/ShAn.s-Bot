@@ -6,12 +6,12 @@ const path = require('path');
 module.exports = {
 	config: {
 		name: "owner",
-		aliases: ["info"],
-		author: "Hasan",
+		aliases: ["shanke"],
+		author: "𝗦𝗵𝗔𝗻",
 		role: 0,
 		shortDescription: " ",
 		longDescription: "",
-		category: "info",
+		category: "𝗜𝗡𝗙𝗢",
 		guide: "{pn}"
 	},
 
@@ -28,17 +28,24 @@ module.exports = {
 				Height: '5"4'
 			};
 
-			const bold = 'https://i.imgur.com/Ch8ZvsM.mp4';
-			const tmpFolderPath = path.join(__dirname, 'tmp');
-
-			if (!fs.existsSync(tmpFolderPath)) {
-				fs.mkdirSync(tmpFolderPath);
-			}
-
-			const videoResponse = await axios.get(bold, { responseType: 'arraybuffer' });
-			const videoPath = path.join(tmpFolderPath, 'owner_video.mp4');
-
-			fs.writeFileSync(videoPath, Buffer.from(videoResponse.data, 'binary'));
+			const ShAn = [
+'https://drive.google.com/uc?export=download&id=1J4yQ13L2WTpdOuqcP0yEmzULACdwfvnQ',
+'https://drive.google.com/uc?export=download&id=1J2ph0PcizaIy9QnK9790j4jXGBwBSjG7',
+'https://drive.google.com/uc?export=download&id=1IWXtQBd9V5xuLL7-dADTKLoprAE6XrOS',
+'https://drive.google.com/uc?export=download&id=1IOW6p0wpC6E8MBv1OfAnG1UWmMKfPw5z',
+'https://drive.google.com/uc?export=download&id=1IKA_yxFxPz09116TSmrk-K55DEW3GFB2',
+'https://drive.google.com/uc?export=download&id=1IH8zjj-fH5M8hwPrI1i6JfKFRlmy7AyX',
+'https://drive.google.com/uc?export=download&id=1IEz8wwc5T5chRzsruT8fETfqJUYTk_1g',
+'https://drive.google.com/uc?export=download&id=1I5iOweiVL_aV8W2k3WJqgEHkHD75PY1k',
+'https://drive.google.com/uc?export=download&id=1I3Jte-iy8bF4SehZ_EHN-EOeoeJSscEO',
+'https://drive.google.com/uc?export=download&id=1I1vfvQnpx6OW9iyM55OGAerAge19bUP4',
+'https://drive.google.com/uc?export=download&id=1I0YRd6OzpRHLFM-pqYmoKuDRe9Ldhfht',
+'https://drive.google.com/uc?export=download&id=1HyhkBI92QKm3dTq6NJpDhGWKHFKn8iN8',
+'https://drive.google.com/uc?export=download&id=1Hy9SmvIJzU5aXbjjGTlEUwCihOWIj6Fk',
+'https://drive.google.com/uc?export=download&id=1Hw-0A--3teOH5k9zWsAc85gwGbxgIJJR',
+'https://drive.google.com/uc?export=download&id=1HqWwyPkSHp7G_HgcH5bUNOW4nQrlcUFy'
+      ]; // Replace with your Google Drive videoid link https://drive.google.com/uc?export=download&id=here put your video id
+    const ShaN = ShAn[Math.floor(Math.random() * ShAn.length)];
 
 			const response = `
 𓀬 𝐎𝐖𝐍𝐄𝐑 𝐈𝐍𝐅𝐎 𓀬 \n
@@ -54,10 +61,8 @@ module.exports = {
 
 			await api.sendMessage({
 				body: response,
-				attachment: fs.createReadStream(videoPath)
+				attachment: fs.createReadStream(ShaN)
 			}, event.threadID, event.messageID);
-
-			fs.unlinkSync(videoPath);
 
 			api.setMessageReaction('😘', event.messageID, (err) => {}, true);
 		} catch (error) {
