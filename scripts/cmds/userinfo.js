@@ -1,110 +1,221 @@
-const axios = require("axios");
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    `https://raw.githubusercontent.com/KingsOfToxiciter/YouTube-Download/refs/heads/main/hasan.json`,
-  );
-  return base.data.api;
-};
+const { GoatWrapper } = require('fca-liane-utils');
 
 module.exports = {
   config: {
     name: "info",
-    aliases: ["whoishe", "whoisshe", "whoami", "atake"],
-    version: "1.0",
+    aliases: ["whois", "me", "stalk", "user"],
+    version: "3.0",
     role: 0,
-    author: "Dipto",
-    Description: "Get user information and profile photo",
-    category: "info",
-    countDown: 10,
+    author: "𝗦𝗵𝗔𝗻",
+    description: "🔍 Get DEEP user insights with FLAIR!",
+    category: "𝗜𝗡𝗙𝗢",
+    countDown: 3,
+    premium: false
   },
 
-  onStart: async function ({
-    event,
-    message,
-    usersData,
-    api,
-    args,
-  }) {
-    const uid1 = event.senderID;
+  onStart: async function({ event, message, usersData, api, args }) {
+    try {
+      // 🎯 Determine target user with 1337 skills
+      const uid = await getTargetUid(event, args);
+      
+      // ⚡ Parallel data loading for MAXIMUM SPEED
+      const [userInfo, avatarUrl, userData, allUsers] = await Promise.all([
+        api.getUserInfo(uid),
+        usersData.getAvatarUrl(uid),
+        usersData.get(uid),
+        usersData.getAll()
+      ]);
 
-    const uid2 = Object.keys(event.mentions)[0];
-    let uid;
+      // 🧠 Analyze user like a pro hacker
+      const analysis = analyzeUser(userInfo[uid], userData, allUsers, uid);
 
-    if (args[0]) {
-      if (/^\d+$/.test(args[0])) {
-        uid = args[0];
-      } else {
-        const match = args[0].match(/profile\.php\?id=(\d+)/);
-        if (match) {
-          uid = match[1];
-        }
-      }
+      // 🎨 Generate RANDOM AWESOME themes
+      const theme = getRandomTheme();
+      
+      // ✨ Build the MOST EPIC response
+      const response = buildEpicResponse(analysis, theme);
+
+      // 💥 Send with STYLE
+      await message.reply({
+        body: response.message,
+        attachment: await global.utils.getStreamFromURL(avatarUrl),
+        mentions: [{
+          tag: userInfo[uid].name,
+          id: uid
+        }]
+      });
+
+    } catch (err) {
+      console.error("💥 Mission Failed:", err);
+      await message.reply("❌ Oops! The spy satellite malfunctioned. Try again!");
     }
-
-    if (!uid) {
-      uid =
-        event.type === "message_reply"
-          ? event.messageReply.senderID
-          : uid2 || uid1;
-    }
-    const response = await require("axios").get(
-      `${await baseApiUrl()}/baby?list=all`
-    );
-    const dataa = response.data || { teacher: { teacherList: [] } };
-    let babyTeach = 0;
-
-    if (dataa?.teacher?.teacherList?.length) {
-      babyTeach = dataa.teacher.teacherList.find((t) => t[uid])?.[uid] || 0;
-    }
-
-    const userInfo = await api.getUserInfo(uid);
-    const avatarUrl = await usersData.getAvatarUrl(uid);
-
-    let genderText;
-    switch (userInfo[uid].gender) {
-      case 1:
-        genderText = "𝐺𝑖𝑟𝑙🙋🏻‍♀️";
-        break;
-      case 2:
-        genderText = "𝐵𝑜𝑦🙋🏻‍♂️";
-        break;
-      default:
-        genderText = "𝐺𝑎𝑦🤷🏻‍♂️";
-    }
-
-    const money = (await usersData.get(uid)).money;
-    const allUser = await usersData.getAll(), rank = allUser.slice().sort((a, b) => b.exp - a.exp).findIndex(user => user.userID === uid) + 1, moneyRank = allUser.slice().sort((a, b) => b.money - a.money).findIndex(user => user.userID === uid) + 1;
-
-    const position = userInfo[uid].type;
-
-    const userInformation = `
-╭────[ 𝐔𝐒𝐄𝐑 𝐈𝐍𝐅𝐎 ]
-├‣ 𝑵𝒂𝒎𝒆: ${userInfo[uid].name}
-├‣ 𝑮𝒆𝒏𝒅𝒆𝒓: ${genderText}
-├‣ 𝑼𝑰𝑫: ${uid}
-├‣ 𝑪𝒍𝒂𝒔𝒔: ${position ? position?.toUpperCase() : "𝙽𝚘𝚛𝚖𝚊𝚕 𝚄𝚜𝚎𝚛🥺"}
-├‣ 𝑼𝒔𝒆𝒓𝒏𝒂𝒎𝒆: ${userInfo[uid].vanity ? userInfo[uid].vanity : "𝙽𝚘𝚗𝚎"}
-├‣ 𝑷𝒓𝒐𝒇𝒊𝒍𝒆 𝑼𝒓𝒍: ${userInfo[uid].profileUrl}
-├‣ 𝑩𝒊𝒓𝒕𝒉𝒅𝒂𝒚: ${userInfo[uid].isBirthday !== false ? userInfo[uid].isBirthday : "𝙿𝚛𝚒𝚟𝚊𝚝𝚎"}
-├‣ 𝑵𝒊𝒄𝒌𝒏𝒂𝒎𝒆: ${userInfo[uid].alternateName || "𝙽𝚘𝚗𝚎"}
-╰‣ 𝑭𝒓𝒊𝒆𝒏𝒅 𝑾𝒊𝒕𝒉 𝑩𝒐𝒕: ${userInfo[uid].isFriend ? "𝚈𝚎𝚜✅" : "𝙽𝚘❎"}
-
-╭─────[ 𝐔𝐒𝐄𝐑 𝐒𝐓𝐀𝐓𝐒 ]
-├‣ 𝑴𝒐𝒏𝒓𝒚: $${formatMoney(money)}
-├‣ 𝑹𝒂𝒏𝒌: #${rank}/${allUser.length}
-├‣ 𝑴𝒐𝒏𝒆𝒚 𝑹𝒂𝒏𝒌: #${moneyRank}/${allUser.length}
-╰‣ 𝑩𝒂𝒃𝒚 𝑻𝒆𝒂𝒄𝒉: ${babyTeach || 0}`;
-
-    message.reply({
-      body: userInformation,
-      attachment: await global.utils.getStreamFromURL(avatarUrl),
-    });
-  },
+  }
 };
 
-function formatMoney(num) {
-  const units = ["", "K", "M", "B", "T", "Q", "Qi", "Sx", "Sp", "Oc", "N", "D"];
-  let unit = 0;
-  while (num >= 1000 && ++unit < units.length) num /= 1000;
-  return num.toFixed(1).replace(/\.0$/, "") + units[unit];
-        }
+// ================ 1337 FUNCTIONS ================
+
+async function getTargetUid(event, args) {
+  // Support: @mention, UID, profile link, or reply
+  if (args[0]?.match(/profile\.php\?id=(\d+)/)) return args[0].match(/profile\.php\?id=(\d+)/)[1];
+  if (/^\d+$/.test(args[0])) return args[0];
+  if (event.type === "message_reply") return event.messageReply.senderID;
+  return Object.keys(event.mentions)[0] || event.senderID;
+}
+
+function analyzeUser(user, data, allUsers, uid) {
+  // 💰 Money formatting that would make Elon jealous
+  const wealth = formatMoney(data.money);
+  
+  // 🏆 Ranking with extra drama
+  const rank = allUsers.sort((a, b) => b.exp - a.exp).findIndex(u => u.userID === uid) + 1;
+  const totalUsers = allUsers.length;
+  
+  // 🌈 Personality analysis (totally scientific)
+  const personality = getPersonality(data.money, user.gender);
+  
+  // ⏳ Account age detection
+  const creationDate = new Date(data.createdAt || Date.now());
+  const accountAge = Math.floor((Date.now() - creationDate) / (1000 * 60 * 60 * 24));
+  
+  return {
+    name: user.name,
+    uid,
+    gender: getGender(user.gender),
+    type: getUserType(user.type),
+    vanity: user.vanity || "None",
+    profileUrl: user.profileUrl,
+    birthday: user.isBirthday || "🤫 Private",
+    isFriend: user.isFriend ? "✅ Bestie!" : "❌ Stranger Danger",
+    wealth,
+    rank,
+    wealthRank: allUsers.sort((a, b) => b.money - a.money).findIndex(u => u.userID === uid) + 1,
+    personality,
+    accountAge,
+    totalUsers
+  };
+}
+
+function getRandomTheme() {
+  const themes = [
+    {
+      name: "Cyberpunk",
+      border: "═╬═",
+      icon: "🌃",
+      color: "🔵"
+    },
+    {
+      name: "Pirate",
+      border: "▄▄▓▄▄",
+      icon: "🏴‍☠️",
+      color: "🟠"
+    },
+    {
+      name: "Wizard",
+      border: "☆✧✦",
+      icon: "🧙",
+      color: "🟣"
+    },
+    {
+      name: "Detective",
+      border: "🕵️‍♂️✧",
+      icon: "🔍",
+      color: "🟤"
+    }
+  ];
+  return themes[Math.floor(Math.random() * themes.length)];
+}
+
+function buildEpicResponse(data, theme) {
+  const title = `${theme.icon} ${theme.name.toUpperCase()} PROFILE SCAN ${theme.icon}`;
+  
+  return {
+    message: `
+${theme.color.repeat(5)} ${title} ${theme.color.repeat(5)}
+
+${theme.border} 𝗜𝗗𝗘𝗡𝗧𝗜𝗧𝗬 𝗩𝗘𝗥𝗜𝗙𝗜𝗘𝗗 ${theme.border}
+🔮 𝗡𝗮𝗺𝗲: ${data.name}
+🧬 𝗨𝗜𝗗: ${data.uid}
+⚡ 𝗧𝘆𝗽𝗲: ${data.type}
+${data.gender.emoji} 𝗚𝗲𝗻𝗱𝗲𝗿: ${data.gender.text}
+
+${theme.border} 𝗦𝗢𝗖𝗜𝗔𝗟 𝗜𝗡𝗧𝗘𝗟 ${theme.border}
+🏷️ 𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲: ${data.vanity}
+📅 𝗔𝗴𝗲: ${data.accountAge} days old
+🎂 𝗕𝗶𝗿𝘁𝗵𝗱𝗮𝘆: ${data.birthday}
+🤝 𝗦𝘁𝗮𝘁𝘂𝘀: ${data.isFriend}
+
+${theme.border} 𝗘𝗖𝗢𝗡𝗢𝗠𝗬 𝗥𝗘𝗣𝗢𝗥𝗧 ${theme.border}
+💰 𝗪𝗲𝗮𝗹𝘁𝗵: $${data.wealth}
+🏆 𝗥𝗮𝗻𝗸: ${data.rank}/${data.totalUsers}
+💎 𝗪𝗲𝗮𝗹𝘁𝗵 𝗥𝗮𝗻𝗸: ${data.wealthRank}/${data.totalUsers}
+
+${theme.border} 𝗣𝗘𝗥𝗦𝗢𝗡𝗔𝗟𝗜𝗧𝗬 𝗔𝗡𝗔𝗟𝗬𝗦𝗜𝗦 ${theme.border}
+🧠 𝗧𝘆𝗽𝗲: ${data.personality.type}
+📝 𝗗𝗲𝘀𝗰: ${data.personality.description}
+
+${"✨".repeat(3)} 𝗘𝗡𝗗 𝗢𝗙 𝗥𝗘𝗣𝗢𝗥𝗧 ${"✨".repeat(3)}
+`.trim(),
+    theme: theme.name
+  };
+}
+
+function getPersonality(money, gender) {
+  const personalities = [
+    {
+      type: "💸 High Roller",
+      description: "Likes fancy avocados and private jets"
+    },
+    {
+      type: "🦉 Wise Owl",
+      description: "Probably reads books and drinks tea"
+    },
+    {
+      type: "🌶️ Spicy Memelord",
+      description: "Definitely posts questionable content"
+    },
+    {
+      type: "🍀 Lucky Newbie",
+      description: "Still figuring out how to tag people"
+    }
+  ];
+  
+  if (money > 1000000) return personalities[0];
+  if (gender == 1) return personalities[1];
+  if (gender == 2) return personalities[2];
+  return personalities[3];
+}
+
+function getGender(gender) {
+  return {
+    1: { emoji: "👩", text: "Female" },
+    2: { emoji: "👨", text: "Male" },
+    default: { emoji: "🌈", text: "Mystery Gender" }
+  }[gender] || { emoji: "❓", text: "Unknown" };
+}
+
+function getUserType(type) {
+  const types = {
+    "user": "👤 Civilian",
+    "page": "📜 Ancient Scroll",
+    "event": "🎪 Party Zone",
+    "group": "👥 Secret Society",
+    "app": "🤖 Robot Overlord",
+    default: "👽 Unknown Entity"
+  };
+  return types[type?.toLowerCase()] || types.default;
+}
+
+function formatMoney(amount) {
+  const suffixes = ["", "K", "M", "B", "T"];
+  let suffixIndex = 0;
+  
+  while (amount >= 1000 && suffixIndex < suffixes.length - 1) {
+    amount /= 1000;
+    suffixIndex++;
+  }
+  
+  return amount.toFixed(amount < 10 ? 1 : 0) + suffixes[suffixIndex];
+}
+
+const wrapper = new GoatWrapper(module.exports);
+wrapper.applyNoPrefix({ allowPrefix: true });
