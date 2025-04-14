@@ -3,15 +3,15 @@ const fs = require ("fs-extra");
 
 module.exports = {
   config: {
-    name: "pair3",
+    name: "pair2",
     aliases: [],
     version: "1.0",
-    author: "OTINXSANDIP",
+    author: "𝗦𝗵𝗔𝗻",
     countDown: 5,
     role: 0,
     shortDescription: " ",
     longDescription: "",
-    category: "love",
+    category: "𝗟𝗢𝗩𝗘",
     guide: "{pn}"
   },
 
