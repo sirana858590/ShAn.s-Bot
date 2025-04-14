@@ -11,11 +11,11 @@ registerFont(path.join(__dirname, 'assets', 'font', 'Poppins-Regular.ttf'), { fa
 module.exports = {
   config: {
     name: "pair",
-    author: "ShAn",
+    author: "𝗦𝗵𝗔𝗻",
     role: 0,
     shortDescription: "Find your perfect match",
     longDescription: "Pair with someone in your group with detailed compatibility analysis and beautiful visuals",
-    category: "love",
+    category: "𝗟𝗢𝗩𝗘",
     guide: {
       en: "{pn} [@mention] (optional) - Pair with someone specific or get a random match"
     }
