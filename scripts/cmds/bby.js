@@ -168,7 +168,7 @@ const funnyReplies = [
     "আমার বস ShAn রে ডাক ওই সিঙ্গেল আছে 🐸🫦",
     "কি হইছে আমার কি কাজে লাগবে তুর !?🌚👀",
     "তুই সেই লুইচ্চাটা না !? 🙂🔪",
-    "Bby daktecho kno ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh 🫦💋\n\n🗣️ShAn🐸🔪",
+    "..Bby daktecho kno ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmaaaaaaaaaaaaaaaaaaahhhhhhhhh 🫦💋\n\n🗣️ShAn🐸🔪",
     "Tui ki janosh tui ekhta bolod !? 🦆💨"
         ];
         return api.sendMessage(funnyReplies[Math.floor(Math.random() * funnyReplies.length)], event.threadID, (error, info) => {
