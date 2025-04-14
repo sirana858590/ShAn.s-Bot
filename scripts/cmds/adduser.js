@@ -2,149 +2,173 @@ const { findUid } = global.utils;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 module.exports = {
-	config: {
-		name: "adduser",
-		aliases:["add"],
-		version: "1.4",
-		author: "NTKhang",
-		countDown: 5,
-		role: 1,
-		shortDescription: {
-			vi: "Thêm thành viên vào box chat",
-			en: "Add user to box chat"
-		},
-		longDescription: {
-			vi: "Thêm thành viên vào box chat của bạn",
-			en: "Add user to box chat of you"
-		},
-		category: "𝗚𝗥𝗢𝗨𝗣 𝗠𝗔𝗡𝗔𝗚𝗘𝗠𝗘𝗡𝗧",
-		guide: {
-			en: "   {pn} [link profile | uid] (or reply to a message)"
-		}
-	},
+  config: {
+    name: "adduser",
+    aliases: ["add"],
+    version: "2.1",
+    author: "NTKhang (fixed by AI)",
+    countDown: 10,
+    role: 1,
+    shortDescription: "Add user to group chat",
+    longDescription: "Add users via UID, profile link, or by replying to their message",
+    category: "GROUP MANAGEMENT",
+    guide: {
+      en: "{pn} [profile link | UID] (or reply to a message)"
+    }
+  },
 
-	langs: {
-		vi: {
-			alreadyInGroup: "Đã có trong nhóm",
-			successAdd: "- Đã thêm thành công %1 thành viên vào nhóm",
-			failedAdd: "- Không thể thêm %1 thành viên vào nhóm",
-			approve: "- Đã thêm %1 thành viên vào danh sách phê duyệt",
-			invalidLink: "Vui lòng nhập link facebook hợp lệ",
-			cannotGetUid: "Không thể lấy được uid của người dùng này",
-			linkNotExist: "Profile url này không tồn tại",
-			cannotAddUser: "Bot bị chặn tính năng hoặc người dùng này chặn người lạ thêm vào nhóm"
-		},
-		en: {
-			alreadyInGroup: "Already in group",
-			successAdd: "- Successfully added %1 members to the group",
-			failedAdd: "- Failed to add %1 members to the group",
-			approve: "- Added %1 members to the approval list",
-			invalidLink: "Please enter a valid facebook link",
-			cannotGetUid: "Cannot get uid of this user",
-			linkNotExist: "This profile url does not exist",
-			cannotAddUser: "Bot is blocked or this user blocked strangers from adding to the group"
-		}
-	},
+  langs: {
+    en: {
+      alreadyInGroup: "🔄 User is already in the group",
+      successAdd: "✅ Successfully added %1 user(s)",
+      failedAdd: "❌ Failed to add %1 user(s)",
+      approve: "⏳ %1 user(s) pending admin approval",
+      invalidLink: "⚠️ Invalid profile link - must be direct Facebook profile URL",
+      cannotGetUid: "⚠️ Couldn't fetch UID - profile may be private or link incorrect",
+      linkNotExist: "⚠️ Profile doesn't exist or can't be accessed",
+      cannotAddUser: "⚠️ Couldn't add user - they may restrict group adds or bot is blocked",
+      noPermission: "🔒 Bot needs admin rights to add users in this group",
+      rateLimit: "⏸️ Pausing due to Facebook rate limits - please wait",
+      unexpectedError: "⚠️ An unexpected error occurred. Please try again."
+    }
+  },
 
-	onStart: async function ({ message, api, event, args, threadsData, getLang }) {
-		const { members, adminIDs, approvalMode } = await threadsData.get(event.threadID);
-		const botID = api.getCurrentUserID();
+  onStart: async function ({ message, api, event, args, threadsData, getLang }) {
+    try {
+      const { members, adminIDs, approvalMode } = await threadsData.get(event.threadID);
+      const botID = api.getCurrentUserID();
+      const isBotAdmin = adminIDs.some(admin => admin.id === botID);
 
-		// যদি কেউ মেসেজ রিপ্লাই দিয়ে কমান্ড চালায়, তাহলে রিপ্লাই করা ইউজারের UID নেওয়া হবে
-		if (event.type == "message_reply") {
-			args = [event.messageReply.senderID]; // আগের আর্গুমেন্ট মুছে শুধুমাত্র রিপ্লাই করা ইউজারের UID নেওয়া হবে
-		}
+      // If command is a reply, use the sender's UID
+      if (event.type === "message_reply") {
+        args = [event.messageReply.senderID];
+      }
 
-		const success = [
-			{
-				type: "success",
-				uids: []
-			},
-			{
-				type: "waitApproval",
-				uids: []
-			}
-		];
-		const failed = [];
+      const results = {
+        added: [],
+        needsApproval: [],
+        failed: []
+      };
 
-		function checkErrorAndPush(messageError, item) {
-			item = item.replace(/(?:https?:\/\/)?(?:www\.)?(?:facebook|fb|m\.facebook)\.(?:com|me)/i, '');
-			const findType = failed.find(error => error.type == messageError);
-			if (findType)
-				findType.uids.push(item);
-			else
-				failed.push({
-					type: messageError,
-					uids: [item]
-				});
-		}
+      // Enhanced Facebook URL pattern matching
+      const profilePatterns = [
+        /(?:https?:\/\/)?(?:www\.|m\.)?facebook\.com\/(profile\.php\?id=)?([a-zA-Z0-9\.\-]+)(?:\/|$)/i,
+        /(?:https?:\/\/)?(?:www\.|m\.)?fb\.com\/(profile\.php\?id=)?([a-zA-Z0-9\.\-]+)(?:\/|$)/i
+      ];
 
-		const regExMatchFB = /(?:https?:\/\/)?(?:www\.)?(?:facebook|fb|m\.facebook)\.(?:com|me)\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[\w\-]*\/)*([\w\-\.]+)(?:\/)?/i;
-		for (const item of args) {
-			let uid;
-			let continueLoop = false;
+      for (const item of args) {
+        if (!item) continue;
+        
+        let uid;
+        let identifier = item;
 
-			if (isNaN(item) && regExMatchFB.test(item)) {
-				for (let i = 0; i < 10; i++) {
-					try {
-						uid = await findUid(item);
-						break;
-					}
-					catch (err) {
-						if (err.name == "SlowDown" || err.name == "CannotGetData") {
-							await sleep(1000);
-							continue;
-						}
-						else if (i == 9 || (err.name != "SlowDown" && err.name != "CannotGetData")) {
-							checkErrorAndPush(
-								err.name == "InvalidLink" ? getLang('invalidLink') :
-									err.name == "CannotGetData" ? getLang('cannotGetUid') :
-										err.name == "LinkNotExist" ? getLang('linkNotExist') :
-											err.message,
-								item
-							);
-							continueLoop = true;
-							break;
-						}
-					}
-				}
-			}
-			else if (!isNaN(item))
-				uid = item;
-			else
-				continue;
+        try {
+          // If numeric UID
+          if (!isNaN(item)) {
+            uid = item;
+          } 
+          // If Facebook profile URL
+          else {
+            let profileMatch;
+            for (const pattern of profilePatterns) {
+              profileMatch = item.match(pattern);
+              if (profileMatch) break;
+            }
 
-			if (continueLoop == true)
-				continue;
+            if (!profileMatch) {
+              throw new Error("invalidLink");
+            }
 
-			if (members.some(m => m.userID == uid && m.inGroup)) {
-				checkErrorAndPush(getLang("alreadyInGroup"), item);
-			}
-			else {
-				try {
-					await api.addUserToGroup(uid, event.threadID);
-					if (approvalMode === true && !adminIDs.includes(botID))
-						success[1].uids.push(uid);
-					else
-						success[0].uids.push(uid);
-				}
-				catch (err) {
-					checkErrorAndPush(getLang("cannotAddUser"), item);
-				}
-			}
-		}
+            // Extract username/ID from URL
+            const profileId = profileMatch[2];
+            identifier = `facebook.com/${profileId}`;
 
-		const lengthUserSuccess = success[0].uids.length;
-		const lengthUserWaitApproval = success[1].uids.length;
-		const lengthUserError = failed.length;
+            // Get UID with retry logic
+            let attempts = 0;
+            while (attempts < 3) {
+              try {
+                uid = await findUid(`https://facebook.com/${profileId}`);
+                await sleep(2000);
+                break;
+              } catch (err) {
+                attempts++;
+                if (attempts === 3) {
+                  if (err.name === "InvalidLink") throw new Error("invalidLink");
+                  if (err.name === "CannotGetData") throw new Error("cannotGetUid");
+                  if (err.name === "LinkNotExist") throw new Error("linkNotExist");
+                  throw new Error("cannotAddUser");
+                }
+                await sleep(3000);
+              }
+            }
+          }
 
-		let msg = "";
-		if (lengthUserSuccess)
-			msg += `${getLang("successAdd", lengthUserSuccess)}\n`;
-		if (lengthUserWaitApproval)
-			msg += `${getLang("approve", lengthUserWaitApproval)}\n`;
-		if (lengthUserError)
-			msg += `${getLang("failedAdd", failed.reduce((a, b) => a + b.uids.length, 0))} ${failed.reduce((a, b) => a += `\n    + ${b.uids.join('\n       ')}: ${b.type}`, "")}`;
-		await message.reply(msg);
-	}
+          // Check if already in group
+          if (members.some(m => m.userID === uid && m.inGroup)) {
+            throw new Error("alreadyInGroup");
+          }
+
+          // Attempt to add user
+          try {
+            await api.addUserToGroup(uid, event.threadID);
+            
+            if (approvalMode && !isBotAdmin) {
+              results.needsApproval.push(identifier);
+            } else {
+              results.added.push(identifier);
+            }
+          } catch (err) {
+            console.error("Add User Error:", err);
+            if (err.message.includes("rate limit")) {
+              await sleep(30000);
+              throw new Error("rateLimit");
+            }
+            throw new Error("cannotAddUser");
+          }
+
+        } catch (error) {
+          results.failed.push({
+            identifier,
+            reason: getLang(error.message) || getLang("unexpectedError")
+          });
+          
+          if (error.message === "rateLimit") {
+            await sleep(30000);
+          }
+        }
+      }
+
+      // Generate comprehensive result message
+      let replyMsg = "";
+      
+      if (results.added.length) {
+        replyMsg += getLang("successAdd", results.added.length) + "\n";
+        if (results.added.length <= 5) {
+          replyMsg += `› ${results.added.join("\n› ")}\n\n`;
+        }
+      }
+      
+      if (results.needsApproval.length) {
+        replyMsg += getLang("approve", results.needsApproval.length) + "\n";
+        if (results.needsApproval.length <= 5) {
+          replyMsg += `› ${results.needsApproval.join("\n› ")}\n\n`;
+        }
+      }
+      
+      if (results.failed.length) {
+        replyMsg += getLang("failedAdd", results.failed.length) + "\n";
+        results.failed.slice(0, 5).forEach(fail => {
+          replyMsg += `› ${fail.identifier}: ${fail.reason}\n`;
+        });
+        if (results.failed.length > 5) {
+          replyMsg += `› ...and ${results.failed.length - 5} more\n`;
+        }
+      }
+
+      await message.reply(replyMsg || getLang("unexpectedError"));
+    } catch (error) {
+      console.error("Command Error:", error);
+      await message.reply(getLang("unexpectedError"));
+    }
+  }
 };
