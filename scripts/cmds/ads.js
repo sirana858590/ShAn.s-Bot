@@ -1,59 +1,59 @@
 const DIG = require("discord-image-generation");
 const fs = require("fs-extra");
+const path = require("path");
 
 module.exports = {
   config: {
     name: "ads",
     version: "1.0",
-    author: "Samir B. Thakuri",
+    author: "𝗦𝗵𝗔𝗻",
     countDown: 1,
     role: 0,
-    shortDescription: "Advertisement!",
-    longDescription: "",
-    category: "fun",
-    guide: "{pn} [mention|leave_blank]",
-    envConfig: {
-      deltaNext: 5
-    }
+    shortDescription: "Create a fake advertisement with a user's avatar",
+    longDescription: "Generates a fake advertisement image featuring the mentioned user's avatar",
+    category: "𝗙𝗨𝗡",
+    guide: "{pn} [mention|reply|leave_blank]",
   },
 
   langs: {
-    vi: {
-      noTag: "Bạn phải tag người bạn muốn tát"
-    },
     en: {
-      noTag: "You must tag the person you want to "
+      success: "Latest Brand In The Market 🥳"
     }
   },
 
   onStart: async function ({ event, message, usersData, args, getLang }) {
-    let mention = Object.keys(event.mentions)
-    let uid;
-
-    if (event.type == "message_reply") {
-      uid = event.messageReply.senderID
-    } else {
-      if (mention[0]) {
-        uid = mention[0]
+    try {
+      let uid;
+      
+      // Determine target user
+      if (event.type === "message_reply") {
+        uid = event.messageReply.senderID;
+      } else if (Object.keys(event.mentions).length > 0) {
+        uid = Object.keys(event.mentions)[0];
       } else {
-        console.log(" jsjsj")
-        uid = event.senderID
+        uid = event.senderID;
       }
+
+      // Generate ad image
+      const avatarUrl = await usersData.getAvatarUrl(uid);
+      const adImage = await new DIG.Ad().getImage(avatarUrl);
+
+      // Save temporary file
+      const tempFilePath = path.join(__dirname, "tmp", `ad_${event.messageID}.png`);
+      await fs.outputFile(tempFilePath, adImage);
+
+      // Send response
+      await message.reply({
+        body: getLang("success"),
+        attachment: fs.createReadStream(tempFilePath)
+      });
+
+      // Clean up
+      fs.unlink(tempFilePath).catch(console.error);
+
+    } catch (error) {
+      console.error("Error in ads command:", error);
+      message.reply("Failed to generate the advertisement. Please try again later.");
     }
-
-    let url = await usersData.getAvatarUrl(uid)
-    let avt = await new DIG.Ad().getImage(url)
-
-    const pathSave = `${__dirname}/tmp/ads.png`;
-    fs.writeFileSync(pathSave, Buffer.from(avt));
-
-    let body = "Latest Brand In The Market 🥳"
-    if (!mention[0]) body = "Latest Brand In The Market 🥳"
-
-    // Send the image as a reply to the command message
-    message.reply({
-      body: body,
-      attachment: fs.createReadStream(pathSave)
-    }, () => fs.unlinkSync(pathSave));
   }
 };
