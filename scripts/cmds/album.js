@@ -7,7 +7,7 @@ module.exports = {
     role: 0,
     author: "Nyx",
     description: "Advanced Album System",
-    category: "media",
+    category: "𝗠𝗘𝗗𝗜𝗔",
     countDown: 5,
     guide: { en: "{p}album [add/list] [category]" }
   },
