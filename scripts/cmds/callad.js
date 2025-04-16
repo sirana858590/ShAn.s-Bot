@@ -1,9 +1,11 @@
+const { GoatWrapper } = require('fca-liane-utils');
 const { getStreamsFromAttachment, log } = global.utils;
 const mediaTypes = ["photo", 'png', "animated_image", "video", "audio"];
 
 module.exports = {
 	config: {
-		name: "callad",
+		name: "called",
+		aliases: ["call"],
 		version: "1.6",
 		author: "NTKhang",
 		countDown: 5,
@@ -193,3 +195,5 @@ module.exports = {
 		}
 	}
 };
+const wrapper = new GoatWrapper(module.exports);
+wrapper.applyNoPrefix({ allowPrefix: true });
