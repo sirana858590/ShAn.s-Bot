@@ -1,4 +1,5 @@
 const axios = require("axios");
+
 const dApi = async () => {
   const base = await axios.get(
     "https://raw.githubusercontent.com/nazrul4x/Noobs/main/Apis.json"
@@ -18,8 +19,6 @@ module.exports.config = {
     en: "Send a valid video link from supported platforms (TikTok, Facebook, YouTube, Twitter, Instagram, etc.), and the bot will download it automatically.",
   },
 };
-
-module.exports.onStart = ({}) => {};
 
 const platforms = {
   TikTok: {
@@ -82,35 +81,42 @@ const downloadVideo = async (apiUrl, url) => {
 module.exports.onChat = async ({ api, event }) => {
   const { body, threadID, messageID } = event;
   if (!body) return;
+  
   const urlMatch = body.match(/https?:\/\/[^\s]+/);
   if (!urlMatch) return;
 
   try {
-    // Start processing reaction
-    await api.setMessageReaction("⏳", event.messageID, () => {}, true);
-    
+    // Set initial reaction
+    api.setMessageReaction("🔄", event.messageID, (err) => {
+      if (err) console.error("Reaction error:", err);
+    }, true);
+
     const url = urlMatch[0];
     const platformMatch = detectPlatform(url);
     if (!platformMatch) {
-      await api.setMessageReaction("❓", event.messageID, () => {}, true);
+      api.setMessageReaction("❌", event.messageID, (err) => {}, true);
       return;
     }
 
     const apiUrl = await dApi();
-    await api.setMessageReaction("✅", event.messageID, () => {}, true);
+    api.setMessageReaction("✅", event.messageID, (err) => {}, true);
+    
     const { downloadUrl, platform } = await downloadVideo(apiUrl, url);
     const videoStream = await axios.get(downloadUrl, { responseType: "stream" });
     
     api.sendMessage(
       {
         body: `✅ Successfully downloaded the video!\n🔖 Platform: ${platform}\n😜Power by Ew'r ShAn's😪`,
-        attachment: [videoStream.data],
+        attachment: videoStream.data,
       },
       threadID,
       messageID
     );
+    
   } catch (error) {
     console.error(`❌ Error while processing the URL:`, error.message);
-    await api.setMessageReaction("❌", event.messageID, () => {}, true);
+    api.setMessageReaction("❌", event.messageID, (err) => {
+      if (err) console.error("Failed to set reaction:", err);
+    }, true);
   }
 };
