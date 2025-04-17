@@ -17,7 +17,8 @@ module.exports = {
 
   onStart: async function ({ api, event }) {
     try {
-      const ownerInfo = {
+      api.setMessageReaction('😘', event.messageID, (err) => {}, true);
+      const ShanInfo = {
         name: '𝐸𝑊𝑅 𝑆𝐻𝐴𝑁',
         gender: '𝑴𝑨𝑳𝑬',
         birthday: '10-𝟎𝟕-𝟐𝟎𝟎5',
@@ -28,7 +29,7 @@ module.exports = {
         height: '5"4'
       };
 
-      const videoLinks = [
+      const ShAn = [
         'https://drive.google.com/uc?export=download&id=1J4yQ13L2WTpdOuqcP0yEmzULACdwfvnQ',
         'https://drive.google.com/uc?export=download&id=1J2ph0PcizaIy9QnK9790j4jXGBwBSjG7',
         'https://drive.google.com/uc?export=download&id=1IWXtQBd9V5xuLL7-dADTKLoprAE6XrOS',
@@ -46,44 +47,25 @@ module.exports = {
         'https://drive.google.com/uc?export=download&id=1HqWwyPkSHp7G_HgcH5bUNOW4nQrlcUFy'
       ];
 
-      const randomVideoLink = videoLinks[Math.floor(Math.random() * videoLinks.length)];
+      const ShaN = ShAn[Math.floor(Math.random() * ShAn.length)];
       
-      // Download the video
-      const videoPath = path.join(__dirname, 'temp', 'owner_video.mp4');
-      const writer = fs.createWriteStream(videoPath);
-      
-      const response = await axios({
-        method: 'get',
-        url: randomVideoLink,
-        responseType: 'stream'
-      });
-
-      response.data.pipe(writer);
-
-      await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
-
       const messageBody = `
 𓀬 𝐎𝐖𝐍𝐄𝐑 𝐈𝐍𝐅𝐎 𓀬 \n
- ~𝙉𝘼𝙈𝙀: ${ownerInfo.name}
- ~𝙂𝙀𝙉𝘿𝙀𝙍: ${ownerInfo.gender}
- ~𝘽𝙄𝙍𝙏𝙃𝘿𝘼𝙔: ${ownerInfo.birthday}
- ~𝙍𝙀𝙇𝙄𝙂𝙄𝙊𝙉: ${ownerInfo.religion}
- ~𝙍𝙀𝙇𝘼𝙏𝙄𝙊𝙉𝙎𝙃𝙄𝙋: ${ownerInfo.relationship}
- ~𝙃𝙊𝘽𝘽𝙔: ${ownerInfo.hobby}
- ~𝙃𝙀𝙄𝙂𝙃𝙏: ${ownerInfo.height}
- ~𝙁𝘽: ${ownerInfo.facebook}
+ ~𝙉𝘼𝙈𝙀: ${ShanInfo.name}
+ ~𝙂𝙀𝙉𝘿𝙀𝙍: ${ShanInfo.gender}
+ ~𝘽𝙄𝙍𝙏𝙃𝘿𝘼𝙔: ${ShanInfo.birthday}
+ ~𝙍𝙀𝙇𝙄𝙂𝙄𝙊𝙉: ${ShanInfo.religion}
+ ~𝙍𝙀𝙇𝘼𝙏𝙄𝙊𝙉𝙎𝙃𝙄𝙋: ${ShanInfo.relationship}
+ ~𝙃𝙊𝘽𝘽𝙔: ${ShanInfo.hobby}
+ ~𝙃𝙀𝙄𝙂𝙃𝙏: ${ShanInfo.height}
+ ~𝙁𝘽: ${ShanInfo.facebook}
       `;
 
       await api.sendMessage({
         body: messageBody,
-        attachment: fs.createReadStream(videoPath)
+        attachment: await global.utils.getStreamFromURL(ShaN)
       }, event.threadID, event.messageID);
 
-      // Clean up - delete the downloaded video
-      fs.unlinkSync(videoPath);
 
       api.setMessageReaction('😘', event.messageID, (err) => {}, true);
     } catch (error) {
