@@ -19,6 +19,7 @@ module.exports.config = {
     en: "Send a valid video link from supported platforms (TikTok, Facebook, YouTube, Twitter, Instagram, etc.), and the bot will download it automatically.",
   },
 };
+module.exports.onStart = ({}) => {};
 
 const platforms = {
   TikTok: {
@@ -61,12 +62,15 @@ const downloadVideo = async (apiUrl, url) => {
   if (!match) {
     throw new Error("No matching platform for the provided URL.");
   }
+
   const { platform, endpoint } = match;
   const endpointUrl = `${apiUrl}${endpoint}${encodeURIComponent(url)}`;
   console.log(`🔗 Fetching from: ${endpointUrl}`);
+
   try {
     const res = await axios.get(endpointUrl);
     console.log(`✅ API Response:`, res.data);
+
     const videoUrl = res.data?.videos?.[0]?.url || res.data?.url;
     if (videoUrl) {
       return { downloadUrl: videoUrl, platform };
@@ -80,43 +84,31 @@ const downloadVideo = async (apiUrl, url) => {
 
 module.exports.onChat = async ({ api, event }) => {
   const { body, threadID, messageID } = event;
+
   if (!body) return;
-  
+
   const urlMatch = body.match(/https?:\/\/[^\s]+/);
   if (!urlMatch) return;
+  
+  const url = urlMatch[0];
 
+  const platformMatch = detectPlatform(url);
+  if (!platformMatch) return;// Ignore unsupported URLs
   try {
-    // Set initial reaction
-    api.setMessageReaction("🔄", event.messageID, (err) => {
-      if (err) console.error("Reaction error:", err);
-    }, true);
-
-    const url = urlMatch[0];
-    const platformMatch = detectPlatform(url);
-    if (!platformMatch) {
-      api.setMessageReaction("❌", event.messageID, (err) => {}, true);
-      return;
-    }
-
+    api.setMessageReaction("✔️", event.messageID, (err) => {}, true);
     const apiUrl = await dApi();
-    api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-    
     const { downloadUrl, platform } = await downloadVideo(apiUrl, url);
+
     const videoStream = await axios.get(downloadUrl, { responseType: "stream" });
-    
     api.sendMessage(
       {
         body: `✅ Successfully downloaded the video!\n🔖 Platform: ${platform}\n😜Power by Ew'r ShAn's😪`,
-        attachment: videoStream.data,
+        attachment: [videoStream.data],
       },
       threadID,
       messageID
     );
-    
   } catch (error) {
     console.error(`❌ Error while processing the URL:`, error.message);
-    api.setMessageReaction("❌", event.messageID, (err) => {
-      if (err) console.error("Failed to set reaction:", err);
-    }, true);
   }
 };
