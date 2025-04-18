@@ -8,12 +8,12 @@ module.exports = {
         name: "kiss",
         aliases: ["kiss"],
         version: "1.0",
-        author: "♡︎ 𝐻𝐴𝑆𝐴𝑁 ♡︎",
+        author: "𝗦𝗵𝗔𝗻",
         countDown: 5,
-        role: 0,
+        role: 2,
         shortDescription: "KISS",
         longDescription: "Send a kiss image with 2 people.",
-        category: "fun",
+        category: "𝗙𝗨𝗡",
         guide: "{pn} tag or reply"
     },
 
